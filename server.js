@@ -55,3 +55,181 @@ function start() {
             }
         });
 }
+
+function viewEmployees() {
+    connection.query("SELECT * FROM employee", (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        start();
+    });
+}
+
+function viewDepartments() {
+    connection.query("SELECT * FROM department", (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        start();
+    });
+}
+
+function viewRoles() {
+    connection.query("SELECT * FROM roles", (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        start();
+    });
+}
+
+function addEmployee() {
+    inquirer
+        .prompt([{
+                name: "first_name",
+                type: "input",
+                message: "Enter employee's first name:",
+            },
+            {
+                name: "last_name",
+                type: "input",
+                message: "Enter employee's last name:",
+            },
+            {
+                name: "role_id",
+                type: "input",
+                message: "Enter employee's role id:",
+            },
+            {
+                name: "manager_id",
+                type: "input",
+                message: "Enter employee's manager id:",
+            },
+        ])
+        .then((answer) => {
+            connection.query(
+                "INSERT INTO employee SET ?", {
+                    first_name: answer.first_name,
+                    last_name: answer.last_name,
+                    role_id: answer.role_id,
+                    manager_id: answer.manager_id,
+                },
+                (err) => {
+                    if (err) throw err;
+                    console.log("Employee added successfully!");
+                    start();
+                }
+            );
+        });
+}
+
+function addDepartment() {
+    inquirer
+        .prompt([{
+            name: "name",
+            type: "input",
+            message: "Enter department name:",
+        }, ])
+        .then((answer) => {
+            console.log(answer);
+            connection.query(
+                "INSERT INTO department SET department_name = ?", 
+                [answer.name],
+                (err) => {
+                    if (err) throw err;
+                    console.log("Department added successfully!");
+                    start();
+                }
+            );
+            // connection.query(
+            //     "INSERT INTO department (department_name)", {
+            //         name: answer.name,
+            //     },
+            //     (err) => {
+            //         if (err) throw err;
+            //         console.log("Department added successfully!");
+            //         start();
+            //     }
+            // );
+        });
+}
+
+function addRole() {
+    inquirer
+        .prompt([{
+                name: "title",
+                type: "input",
+                message: "Enter role title:",
+            },
+            {
+                name: "salary",
+                type: "input",
+                message: "Enter role salary:",
+            },
+            {
+                name: "department_id",
+                type: "input",
+                message: "Enter department id:",
+            },
+        ])
+        .then((answer) => {
+            connection.query(
+                "INSERT INTO role SET ?", {
+                    title: answer.title,
+                    salary: answer.salary,
+                    department_id: answer.department_id,
+                },
+                (err) => {
+                    if (err) throw err;
+                    console.log("Role added successfully!");
+                    start();
+                }
+            );
+        });
+}
+
+function updateEmployeeRole() {
+    inquirer
+        .prompt([{
+                name: "employee_id",
+                type: "input",
+                message: "Enter employee id:",
+            },
+            {
+                name: "role_id",
+                type: "input",
+                message: "Enter new role id:",
+            },
+        ])
+        .then((answer) => {
+            connection.query(
+                "UPDATE employee SET role_id = ? WHERE id = ?", [answer.role_id, answer.employee_id],
+                (err) => {
+                    if (err) throw err;
+                    console.log("Employee role updated successfully!");
+                    start();
+                }
+            );
+        });
+}
+
+function deleteEmployeeDepartmentRole() {
+    inquirer
+        .prompt([{
+            name: "table",
+            type: "list",
+            message: "What would you like to delete?",
+            choices: ["Employee", "Department", "Role"],
+        }, ])
+        .then((answer) => {
+            switch (answer.table) {
+                case "Employee":
+                    deleteEmployee();
+                    break;
+                case "Department":
+                    deleteDepartment();
+                    break;
+                case "Role":
+                    deleteRole();
+                    break;
+            }
+        });
+}
+
